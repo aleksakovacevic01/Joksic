@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { CONTACT } from "@/lib/site";
+
+type Status = "idle" | "submitting" | "success" | "error";
 
 export default function ContactForm() {
   const [values, setValues] = useState({
@@ -11,23 +12,52 @@ export default function ContactForm() {
     childAge: "",
     message: "",
   });
+  const [status, setStatus] = useState<Status>("idle");
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    setStatus("submitting");
 
-    const subject = `Zakazivanje termina — ${values.name || "novi upit"}`;
-    const body = [
-      `Ime: ${values.name}`,
-      `Telefon: ${values.phone}`,
-      `Email: ${values.email}`,
-      `Uzrast deteta: ${values.childAge}`,
-      "",
-      values.message,
-    ].join("\n");
+    try {
+      const formData = new FormData();
+      formData.append("access_key", process.env.NEXT_PUBLIC_WEB3FORMS_KEY ?? "");
+      formData.append("subject", `Zakazivanje termina — ${values.name || "novi upit"}`);
+      formData.append("from_name", "Sajt — Logopedski kabinet Dunje Joksić");
+      formData.append("name", values.name);
+      formData.append("phone", values.phone);
+      formData.append("email", values.email);
+      formData.append("Uzrast deteta", values.childAge);
+      formData.append("message", values.message);
 
-    window.location.href = `mailto:${CONTACT.email}?subject=${encodeURIComponent(
-      subject,
-    )}&body=${encodeURIComponent(body)}`;
+      const response = await fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        body: formData,
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        setStatus("success");
+        setValues({ name: "", phone: "", email: "", childAge: "", message: "" });
+      } else {
+        setStatus("error");
+      }
+    } catch {
+      setStatus("error");
+    }
+  }
+
+  if (status === "success") {
+    return (
+      <div className="rounded-xl bg-sage-50 px-5 py-6 text-center">
+        <p className="font-display text-lg font-semibold text-sage-700">
+          Poruka je poslata!
+        </p>
+        <p className="mt-1 text-sm text-ink-500/80">
+          Javićemo se u najkraćem mogućem roku.
+        </p>
+      </div>
+    );
   }
 
   return (
@@ -93,13 +123,20 @@ export default function ContactForm() {
 
       <button
         type="submit"
-        className="mt-2 inline-flex items-center justify-center rounded-full bg-terracotta-500 px-7 py-3.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-terracotta-600"
+        disabled={status === "submitting"}
+        className="mt-2 inline-flex items-center justify-center rounded-full bg-terracotta-500 px-7 py-3.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-terracotta-600 disabled:opacity-60"
       >
-        Pošalji
+        {status === "submitting" ? "Šalje se…" : "Pošalji"}
       </button>
+
+      {status === "error" && (
+        <p className="text-xs text-red-600">
+          Došlo je do greške. Pokušajte ponovo ili nas pozovite direktno.
+        </p>
+      )}
       <p className="text-xs text-ink-500/60">
-        Klikom na „Pošalji” otvoriće se vaš email program sa popunjenom
-        porukom.
+        Popunjavanjem forme šaljete nam poruku direktno — javićemo se u
+        najkraćem mogućem roku.
       </p>
     </form>
   );

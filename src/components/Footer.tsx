@@ -33,8 +33,26 @@ export default function Footer() {
           <p className="text-sm font-semibold uppercase tracking-wide text-ink-500">
             Kontakt
           </p>
-          <p className="text-sm text-ink-500/80">📞 {CONTACT.phone}</p>
-          <p className="text-sm text-ink-500/80">📧 {CONTACT.email}</p>
+          <a
+            href={`tel:${CONTACT.phoneHref}`}
+            className="text-sm text-ink-500/80 transition-colors hover:text-sage-700"
+          >
+            📞 {CONTACT.phone}
+          </a>
+          <a
+            href={`mailto:${CONTACT.email}`}
+            className="text-sm text-ink-500/80 transition-colors hover:text-sage-700"
+          >
+            📧 {CONTACT.email}
+          </a>
+          <a
+            href={CONTACT.whatsappHref}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm text-ink-500/80 transition-colors hover:text-sage-700"
+          >
+            💬 WhatsApp
+          </a>
           <p className="text-sm text-ink-500/80">📍 {CONTACT.address}</p>
           <p className="text-sm text-ink-500/80">🕒 {CONTACT.hours}</p>
         </div>

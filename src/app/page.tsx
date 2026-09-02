@@ -82,7 +82,7 @@ export default function Home() {
           <Reveal className="relative order-2 aspect-[4/3] w-full overflow-hidden rounded-3xl lg:order-1">
             <Image
               src="/images/welcome.jpg"
-              alt="Dete uči kroz igru"
+              alt="Dunja Joksić"
               fill
               className="object-cover"
             />

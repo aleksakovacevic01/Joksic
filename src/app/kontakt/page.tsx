@@ -8,8 +8,15 @@ import { CONTACT } from "@/lib/site";
 export const metadata: Metadata = { title: "Kontakt" };
 
 const INFO = [
-  { icon: "📞", label: "Telefon", value: CONTACT.phone },
-  { icon: "📧", label: "E-mail", value: CONTACT.email },
+  { icon: "📞", label: "Telefon", value: CONTACT.phone, href: `tel:${CONTACT.phoneHref}` },
+  { icon: "📧", label: "E-mail", value: CONTACT.email, href: `mailto:${CONTACT.email}` },
+  {
+    icon: "💬",
+    label: "WhatsApp",
+    value: CONTACT.phone,
+    href: CONTACT.whatsappHref,
+    external: true,
+  },
   { icon: "📍", label: "Adresa", value: CONTACT.address },
   { icon: "🕒", label: "Radno vreme", value: CONTACT.hours },
 ];
@@ -33,17 +40,22 @@ export default function KontaktPage() {
         <Reveal className="mt-12 grid gap-12 lg:grid-cols-2">
           <div className="flex flex-col gap-8">
             <div className="grid gap-4 sm:grid-cols-2">
-              {INFO.map((item) => (
-                <div
-                  key={item.label}
-                  className="rounded-2xl bg-sage-50 px-5 py-4"
-                >
-                  <p className="text-xs font-semibold uppercase tracking-wide text-sage-700">
-                    {item.icon} {item.label}
-                  </p>
-                  <p className="mt-1 text-sm text-ink-500/90">{item.value}</p>
-                </div>
-              ))}
+              {INFO.map((item) => {
+                const Wrapper = item.href ? "a" : "div";
+                return (
+                  <Wrapper
+                    key={item.label}
+                    {...(item.href ? { href: item.href } : {})}
+                    {...(item.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+                    className={`rounded-2xl bg-sage-50 px-5 py-4 ${item.href ? "transition-colors hover:bg-sage-100" : ""}`}
+                  >
+                    <p className="text-xs font-semibold uppercase tracking-wide text-sage-700">
+                      {item.icon} {item.label}
+                    </p>
+                    <p className="mt-1 text-sm text-ink-500/90">{item.value}</p>
+                  </Wrapper>
+                );
+              })}
             </div>
 
             <div className="placeholder-box flex aspect-[4/3] w-full items-center justify-center overflow-hidden rounded-3xl border-2 border-dashed border-sage-300">
